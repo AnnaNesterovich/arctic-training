@@ -239,7 +239,10 @@ write.csv(catch_clean, "catch_clean.csv", row.names = F)
 ```
 
 
-
+If I want git to ignore this new csv
+adding to .gitignore
+#csv files
+catch_clean.csv
 
 
 
