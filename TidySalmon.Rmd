@@ -147,4 +147,101 @@ Year_mean
 
 # Join the Region Definitions
 
+```{r}
+region_defs <- read.csv(url("https://knb.ecoinformatics.org/knb/d1/mn/v2/object/df35b.303.1",
+                            method = "libcurl"),
+                        stringsAsFactors = FALSE) %>% 
+    select(code, mgmtArea)
+
+head(region_defs)
+```
+
+
+```{r}
+catch_joined <- left_join(catch_clean, region_defs, by = c("Region" = "code"))
+head(catch_joined)
+```
+
+Could be written as 
+catch_joined <- catch_clean %>% 
+left_join(region_defs)
+but not visually as clear
+
 # Misc. Functions
+
+Dummy data
+```{r}
+dates_df <- data.frame(date = c("5/24/1930",
+                                "5/25/1930",
+                                "5/26/1930",
+                                "5/27/1930",
+                                "5/28/1930"),
+                       stringsAsFactors = FALSE)
+dates_df
+
+```
+
+Separate
+```{r}
+
+dates_split <- dates_df %>% 
+  separate(date, c("month", "day", "year"), "/")
+```
+
+```{r}
+dates_split <- dates_df %>% 
+  separate(date, c("month", "day", "year"), "/", remove=F)
+```
+
+
+Exercise 
+```{r}
+cities_df <- data.frame(city = c("Juneau AK", 
+                                 "Sitka AK", 
+                                 "Anchorage AK"),
+                        stringsAsFactors = FALSE)
+cities_df
+```
+
+```{r}
+#separate(cities_df, into=c("City", "State_code"), " ", remove=F)
+cities_split <- cities_df %>% 
+  separate(city, c("City", "State_code"), " ", remove=F)
+cities_split
+```
+
+```{r}
+city_split <- separate(cities_df, city, c("city", "State-code"))
+city_split
+```
+
+
+Uniting
+```{r}
+dates_unite <- dates_split %>% 
+    unite(col=date_iso, year, month, day, sep="-")
+
+head(dates_unite)
+```
+
+```{r}
+#changing the number of digits in say a month
+library(stringr)
+
+str_pad("5", 2, side = "left", pad ="0")
+
+month <- c("5", "05", "003")
+str_pad(month, 2, side = "left", pad ="0")
+```
+
+```{r}
+write.csv(catch_clean, "catch_clean.csv", row.names = F)
+```
+
+
+
+
+
+
+
+
