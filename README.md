@@ -21,3 +21,5 @@ Learning to make and manage branches
 
 Adding a few lines to create a few conflicts...
 
+Adding another line, pushed first change, but the other two
+
