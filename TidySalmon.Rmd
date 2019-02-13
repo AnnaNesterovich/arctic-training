@@ -1,0 +1,88 @@
+---
+title: "TidySalmon"
+author: "Anna Nesterovich"
+date: '13 февраля 2019 г '
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(dplyr)
+library(tidyr)
+
+#to call stats filter - stats::filter()
+#to call stats lag - stats::lag()
+#also masked from the base: intersect, setdiff, setequal, union
+```
+
+
+# Reformat Catch Data
+
+* remove "all" column
+* create species column
+    * move from wide to long format
+*general QA
+
+Grabbing the data from
+[Mike Byerly. Alaska commercial salmon catches by management region (1886- 1997). Gulf of Alaska Data Portal. df35b.304.2.](https://knb.ecoinformatics.org/view/df35b.304.2)
+
+```{r eval=FALSE}
+catch_original <- read.csv("https://knb.ecoinformatics.org/knb/d1/mn/v2/object/df35b.302.1")
+```
+
+If that doesn't work, this should
+```{r}
+catch_original <- read.csv(url("https://knb.ecoinformatics.org/knb/d1/mn/v2/object/df35b.302.1", method = "libcurl"),
+                    stringsAsFactors = FALSE)
+head(catch_original)
+```
+
+Remove the 'all' and 'notesRegCode' columns using 'select'
+Remember about the pipe operator %>%
+
+So df_filtered <- filter(df, ...)
+df_selected <- select(df_filtered, ...)
+
+translates into 
+
+df_cleaned <- df %>% 
+              filter(...) %>%
+              select(...)
+              
+Which can be very useful in my Shiny App.
+
+To print %>% - ctrl + shift + m
+
+```{r}
+catch_long <- catch_original %>% 
+    select(-All, -notesRegCode) %>%  #select comuns you want moved from wide to long
+    gather(key="species", value="catch", -Region, -Year) #look at all columns escept Region and year
+    
+
+# it could be select select(Region, Year, and so on, but if there more,
+#it's easier to 'de-select')
+
+head(catch_long)
+```
+
+```{r}
+#want to move back to the wide format
+catch_wide <- catch_long %>% 
+    spread(key=species, value = catch)
+head(catch_wide)
+```
+
+```{r}
+#or we can do
+catch_wide <- catch_long %>% 
+    spread(key="Region", value = "catch")
+head(catch_wide)
+```
+
+
+# Join the Region Definitions
+
+# Misc. Functions
