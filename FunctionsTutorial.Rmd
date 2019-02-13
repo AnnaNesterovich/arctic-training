@@ -69,3 +69,10 @@ fahr_to_celsius <- function(fahr){
 at param - everything that in the argument section of the function description
 at return - makes the value section
 
+
+Can create a separate script with all the function that I write and need
+```{r}
+source("Convertions.R")
+new_celsius_to_fahr(36.6)
+```
+
