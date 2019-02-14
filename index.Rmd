@@ -39,6 +39,7 @@ All the libraries we'll need
 library(dplyr)
 library(tidyr)
 library(ggplot2)
+library(scales)
 ```
 
 
@@ -109,9 +110,11 @@ ggplot(annual_esc, aes(x = Species, y = annualEsc, fill=SASAP.Region)) +
 ```{r}
 #I can save all the theme settings and use it for a bunch of plots
 my_theme <- theme_bw() +   #theme_test looks very good
-    theme(legend.position="bottom", legend.title = element_blank())
+    theme(legend.position="bottom", legend.title = element_blank(),
+          plot.title=element_text(hjust=0.5, color="green"),
+              axis.text.y = element_text(angle = 45))
 ```
-
+First theme_test or whatever, then theme. Otherwise the theme will be overridden. Cll theme only once
 
 ```{r}
 #just Kodiak
@@ -121,8 +124,32 @@ ggplot(filter(annual_esc, SASAP.Region=="Kodiak"), aes(x=year, y=annualEsc, colo
     ylab("Escapment (num of fish") +
     xlab("Year") +
     ggtitle("Kodiak Salmon Escapment") +
+    scale_y_continuous(labels=comma) +  #comma, percent
     my_theme
 ```
 If when reading the file, there wasn't stringsAsFactors=F, there would be a problem converting to numbers. Or maybe not.
+
+
+```{r, fig.width=5, fig.height=8}
+#that sets the size of the picture I want in inches
+p <- ggplot(annual_esc, aes(x=year, y=annualEsc, color=Species)) +
+    geom_line()+
+    geom_point() +
+    scale_y_continuous(label=comma)+
+    facet_wrap(~SASAP.Region, scales="free_y", ncol=2) +
+    my_theme
+p
+
+#SAVING PLOTS
+
+ggsave("Figures/regional_escapment.tiff", plot=p, width=7, height=8, units="in", dpi=400)
+
+#will not ask overwriting the graph with a new code
+```
+
+
+
+
+
 
 # Generate an interactive map
