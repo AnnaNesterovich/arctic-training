@@ -1,7 +1,7 @@
 ---
-title: "Untitled"
+title: "Data Visialization"
 author: "Anna Nesterovich"
-date: '14 февраля 2019 г '
+date: '1February 14th, 2019 г '
 output: html_document
 ---
 
@@ -9,22 +9,120 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
+# Reformat data for plotting 
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+Alaska Department of Fish and Game, Division of Commercial Fisheries. 2017. Daily salmon escapement counts from the OceanAK database, Alaska, 1921-2017. Knowledge Network for Biocomplexity. doi:10.5063/F1S46Q6M.
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+```{r}
+data_url <- "https://knb.ecoinformatics.org/knb/d1/mn/v2/object/urn%3Auuid%3Af119a05b-bbe7-4aea-93c6-85434dcb1c5e"
 
-```{r cars}
-summary(cars)
+#looks for the file on disk first, then downloads
+esc <- tryCatch(
+    read.csv("data/escapement.csv", stringsAsFactors = FALSE),
+    error=function(cond) {
+        message(paste("Escapement file does not seem to exist, so get it from the KNB."))
+        esc <- read.csv(url(data_url, method = "libcurl"), stringsAsFactors = FALSE)
+        return(esc)
+    }
+)
+
+head(esc)
 ```
 
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r}
+esc <- read.csv(url("https://knb.ecoinformatics.org/knb/d1/mn/v2/object/urn%3Auuid%3Af119a05b-bbe7-4aea-93c6-85434dcb1c5e", method="libcurl"), stringsAsFactors=F)
+head(esc)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+All the libraries we'll need 
+```{r}
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+```
+
+
+* calculate annual escapment by species and region
+* filter for just Pacific salmon (Sockeye, Chinook, Coho, Pink, Chum)
+
+annual_esc
+use functions:
+gather
+spread
+rename
+mutate
+select
+filter
+group_by
+summarize
+arrange
+separate
+unite
+split-apply-combine (region as grouping variable)
+
+```{r}
+#separate for the date to extract year from it
+#group_by - we want to group by region and year and species
+#summarize - to sum all the dily counts into annual counts for a species
+    #in a region for a year
+#filter - pull out the species we want (the 5 Pacific ones)
+#Species %in% c(...), not the or| thing would be better
+
+annual_esc <- esc %>% 
+  separate(sampleDate, c("year", "month", "day"), "-", remove=F) %>% 
+    #if I don't want to ungroup later, I need to do year as numeric here
+    group_by(SASAP.Region, Species, year) %>% 
+    summarize(annualEsc = sum(DailyCount)) %>% 
+    filter(Species == "Sockeye" | Species == "Chinook" |
+               Species =="Coho" | Species =="Pink" | Species=="Chum") %>% 
+    #need to coerce year to numeric type
+    ungroup() %>% 
+    mutate(year=as.numeric(year))
+annual_esc
+
+```
+
+So now the data is tidy enough and we are going to make some plots
+
+# Generate some static plots
+first is the ggplot call with aes stand for aestetics, what you want to add to the plot and how it looks like
+the second part is geometry, to tell it how to plot your data there, some sort of geom function and there are a lot, we'll do bar plot
+color is the outline, fill the color within, color goes not in the aes, not a variable in the dataset, it goes to geom
+```{r}
+ggplot(annual_esc, aes(x = Species, y = annualEsc)) +
+    geom_col(color="blue", fill="cornflowerblue")
+```
+
+Can put almost everything into geom, when you say want different geometries on the the same plot (bar and a line say), or two diff datasets on the same plot
+```{r}
+ggplot(annual_esc) +
+    geom_col(mapping=aes(x = Species, y = annualEsc), color="blue", fill="cornflowerblue")
+```
+scale_fill_manual can specify colors in pairs
+there is a good cheatsheet for ggplot vizulation in help
+```{r}
+ggplot(annual_esc, aes(x = Species, y = annualEsc, fill=SASAP.Region)) +
+    scale_fill_brewer(palette="Dark2") +
+    geom_col()
+```
+
+```{r}
+#I can save all the theme settings and use it for a bunch of plots
+my_theme <- theme_bw() +   #theme_test looks very good
+    theme(legend.position="bottom", legend.title = element_blank())
+```
+
+
+```{r}
+#just Kodiak
+ggplot(filter(annual_esc, SASAP.Region=="Kodiak"), aes(x=year, y=annualEsc, color=Species)) +
+    geom_line() +
+    geom_point() +
+    ylab("Escapment (num of fish") +
+    xlab("Year") +
+    ggtitle("Kodiak Salmon Escapment") +
+    my_theme
+```
+If when reading the file, there wasn't stringsAsFactors=F, there would be a problem converting to numbers. Or maybe not.
+
+# Generate an interactive map
