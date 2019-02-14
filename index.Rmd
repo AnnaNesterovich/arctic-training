@@ -40,6 +40,8 @@ library(dplyr)
 library(tidyr)
 library(ggplot2)
 library(scales)
+library(leaflet)
+library(DT)
 ```
 
 
@@ -60,6 +62,7 @@ arrange
 separate
 unite
 split-apply-combine (region as grouping variable)
+distinct - pulls out unique row or combinations of rows
 
 ```{r}
 #separate for the date to extract year from it
@@ -153,3 +156,46 @@ ggsave("Figures/regional_escapment.tiff", plot=p, width=7, height=8, units="in",
 
 
 # Generate an interactive map
+
+Map the sampling locations for escapement
+
+8 find (create a dataframe) distinct lat/long/location combinations
+
+```{r}
+locations <- esc %>% 
+    distinct(Location, Latitude, Longitude) %>% 
+    drop_na()
+
+head(locations)
+```
+
+```{r, echo=F}
+datatable(locations)
+```
+
+Let's make a map!
+
+
+```{r}
+leaflet(locations) %>% 
+    addTiles() %>%  #just draws the map !!!!! Remember the projection (markater)
+    addMarkers(lng= ~Longitude, lat = ~ Latitude, popup = ~ Location)
+```
+
+
+
+How to change spacing in RMarckdown
+? html break tag
+<br/>
+
+leaflet is not build to generate static maps, use other packs
+such as gglot
+geom_sf for vector shapefiles
+geom_raster
+
+
+
+How to change the basemap tiles? Couldn't figure out right away. Too many options in the package -> not a very good documentation.
+
+
+Change markers from that default droplets. including custom (like tiny diatoms?) 
