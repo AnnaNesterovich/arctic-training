@@ -9,6 +9,8 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+Don't forget to look at that sf (spatial 'simple features') package
+
 # Reformat data for plotting 
 
 Alaska Department of Fish and Game, Division of Commercial Fisheries. 2017. Daily salmon escapement counts from the OceanAK database, Alaska, 1921-2017. Knowledge Network for Biocomplexity. doi:10.5063/F1S46Q6M.
@@ -199,3 +201,11 @@ How to change the basemap tiles? Couldn't figure out right away. Too many option
 
 
 Change markers from that default droplets. including custom (like tiny diatoms?) 
+
+
+
+bookdown package generates a book from your RMarkdown documents (needs a couple more files to show it how to render)
+the rest of site is build in package blockdown
+
+
+For dyplr/tidyr reference see my [data tidying page](https://annanesterovich.github.io/arctic-training/)

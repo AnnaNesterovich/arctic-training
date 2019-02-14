@@ -1,0 +1,22 @@
+---
+title: "SpringPlan"
+author: "Anna Nesterovich"
+date: 'February 14th, 2019 г '
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## February
+* 18 - Proxy paper and give it to Beth
+* 25 - Draft the mooring paper and give it to Beth/revise proxy paper
+## March
+* 4 - Introduction and conclusion/second draft of the mooring paper
+* 11 - revise everything
+* 18 - give the thesis to Beth
+* 25 - revise the thesis
+## April
+* 1 - give the thesis to the committee
+* 15 - Defense

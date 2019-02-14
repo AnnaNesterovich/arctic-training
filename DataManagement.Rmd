@@ -1,0 +1,19 @@
+---
+title: "DataManagement"
+author: "Anna Nesterovich"
+date: '14 февраля 2019 г '
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Ten simple rules for good data management 
+Micheler or something like that
+
+DMPtool for us
+DMPonline for Europe
+
+Authorship guidlines
+to: Potential co-authors :) In section 15.2
