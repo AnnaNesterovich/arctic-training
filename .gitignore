@@ -38,3 +38,6 @@ rsconnect/
 
 #csv file
 catch_clean.csv
+
+#figures - they are too large
+Figures/*
