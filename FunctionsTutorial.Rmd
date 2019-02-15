@@ -76,3 +76,10 @@ source("Convertions.R")
 new_celsius_to_fahr(36.6)
 ```
 
+
+##Use our package
+```{r}
+library(mytools)
+environment_info("Wow it works in Rmd")
+```
+

@@ -1,0 +1,74 @@
+---
+title: "OpenData"
+author: "Anna Nesterovich"
+date: '15 февраля 2019 г '
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+A [link](https://github.com/ropensci/rnoaa/) forr rnoaa package
+
+```{r, include=FALSE}
+#install.packages("rnoaa") # run once
+#install.packages("ncdf4") # run once
+```
+
+```{r, echo=F}
+library(rnoaa)
+library(ncdf4)
+library(ggplot2)
+```
+
+# Accessing buoy data using 'rnoaa'
+
+```{r}
+#want to grab some data
+?buoy
+bd <- buoy(dataset = 'cwind', buoyid = 46080, year = 2018, datatype = "c")
+#turn it into something familiar - a dataframe
+#as.POSIXct wraps time, make it a date format
+wind_speed <- data.frame(time = as.POSIXct(bd$data$time), speed = bd$data$wind_spd, stringsAsFactors = F)
+```
+
+
+```{r}
+ggplot(wind_speed, aes(x = time, y = speed)) + 
+    geom_point() +
+    xlab("") + #because it's just a bunch of dates
+    ylab("Wind Speed (m/s)") +
+    ggtitle("2018 NOAA buoy observations near Kodiak, AK") +
+    theme_bw()
+```
+
+
+A new package mapr
+
+```{r}
+#install.packages("mapr", dependencies = TRUE) # run once
+```
+
+```{r}
+#will need two libraries 
+library(mapr)
+library(spocc)
+```
+
+Plot the locations of GBIF species occurrence data for grizzly and polar bears, with different colors for each species
+
+```{r}
+#create a vector of species
+spp <- c('Ursus arctos', 'Ursus maritimus')
+#new object with data, has_cords since we are mapping, limit - number of obs
+#maybe the limit should be lower
+dat <- occ(query = spp, from = 'gbif', has_coords = TRUE, limit = 500)
+#wrapper around the leaflet package to make a map
+#size - ? alpha sets transparentcy
+map_leaflet(dat, size = 1, color = c("brown", "gray"), alpha = 1)
+```
+
+
+
+
